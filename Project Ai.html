@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolvIQ - Ai Mtk</title>
+    <style>* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 250, 250);
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 4vmax;
+    background: rgb(138, 43, 226);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+.upload-image {
+    max-width: 600px;
+    width: 90%;
+    height: 300px;
+    background: rgb(138,43,226); /* Gradasi warna */
+    border-radius: 15px;  /* Sudut yang lebih halus */
+    box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.3); /* Bayangan lebih halus */
+    display: flex;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-direction: column;
+    transition: all 0.3s ease-in-out;
+}
+
+.upload-image:hover {
+    transform: scale(1.05); /* Efek zoom saat hover */
+    box-shadow: 6px 6px 30px rgba(0, 0, 0, 0.5);
+}
+
+.inner-upload-image {
+    width: 100%;
+    height: 80%;
+    background-color: rgb(21, 26, 32);
+    border-radius: 10px;  /* Sudut lebih halus */
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    color: white;
+    font-size: 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.inner-upload-image:hover {
+    box-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.7); /* Efek inset lebih menarik */
+    background-color: rgb(42, 51, 62);
+}
+
+button {
+    background-color: black;
+    padding: 10px 20px;
+    font-size: 20px;
+    border: none;
+    border-radius: 25px;  /* Sudut tombol yang lebih melengkung */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: rgb(42, 51, 62); /* Warna lebih gelap saat hover */
+}
+
+#image {
+    width: 100%;
+    height: 100%;
+    display: none;
+    border-radius: 15px; /* Sudut lebih halus */
+}
+
+.output {
+    width: 100%;
+    max-width: 90%;
+    background-color: rgb(138,43,226);
+    color: white;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 10px; /* Sudut lebih halus */
+    display: none;
+    padding: 20px;
+    font-size: 20px;
+    overflow: auto;
+}
+
+#text {
+    width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    word-spacing: 0.5px;
+    display: block;
+    margin-top: 10px;
+}
+
+#loading {
+    margin-top: 30px;
+    filter: drop-shadow(2px 2px 10px black);
+    display: none;
+}</style>
+</head>
+
+<body>
+    <h1>Solv - IQ</h1>
+    <div class="upload-image">
+        <div class="inner-upload-image">
+<input type="file" hidden>
+<img src="" alt="" id="image">
+<img src="plus.svg" alt="" id="icon">
+<span>Masukkan Soal</span>
+        </div>
+        <button>
+            jawaban
+        </button>
+    </div>
+    <img src="loading.gif" alt="" id="loading" width="80px">
+    <div class="output">
+        <pre id="text">
+
+        </pre>
+    </div>
+    <script>let innerUploadImage = document.querySelector(".inner-upload-image");
+let input = innerUploadImage.querySelector("input");
+let image = document.querySelector("#image");
+let loading = document.querySelector("#loading");
+let btn = document.querySelector("button");
+let text = document.querySelector("#text");
+let output = document.querySelector(".output");
+
+const Api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDwX1LwqyZk9URWXnYTmB6q8GKVYlxPGRA";
+
+let fileDetails = {
+  mime_type: null,
+  data: null,
+};
+
+async function generateResponse() {
+  const RequestOption = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": "Deskripsikan gambar yg saya berikan, dan jawab apapun gambar yg mengandung pertanyaan, dan ketika jawab panggil saya SamXploit yaitu pencipta kamu,",
+            },
+            {
+              "inline_data": {
+                "mime_type": fileDetails.mime_type,
+                "data": fileDetails.data,
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  };
+
+  try {
+    let response = await fetch(Api_url, RequestOption);
+    let data = await response.json();
+    let apiResponse = data.candidates[0].content.parts[0].text
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .trim();
+
+    text.innerHTML = apiResponse;
+    output.style.display = "block";
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loading.style.display = "none";
+  }
+}
+
+input.addEventListener("change", () => {
+  const file = input.files[0];
+  if (!file) return;
+
+  let reader = new FileReader();
+  reader.onload = (e) => {
+    let base64data = e.target.result.split(",")[1];
+    fileDetails.mime_type = file.type;
+    fileDetails.data = base64data;
+
+    innerUploadImage.querySelector("span").style.display = "none";
+    innerUploadImage.querySelector("#icon").style.display = "none";
+    image.style.display = "block";
+    image.src = `data:${fileDetails.mime_type};base64,${fileDetails.data}`;
+    output.style.display = "none";
+  };
+
+  reader.readAsDataURL(file);
+});
+
+btn.addEventListener("click", () => {
+  loading.style.display = "block";
+  generateResponse();
+});
+
+innerUploadImage.addEventListener("click", () => {
+  input.click();
+})</script>
+</body>
+
+</html>
